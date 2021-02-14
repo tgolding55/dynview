@@ -92,21 +92,24 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
   };
 
   const updateSelectedObj = ({ key, value }) => {
-    console.log("UPDATING SELEC");
     setSelectedObj({ ...selectedObj, [key]: value });
     updateObj({ obj: selectedObj, key, value });
   };
 
   const updateObj = ({ obj, key, value }) => {
-    const objIndex = viewObjects.findIndex(
-      viewObject => viewObject.id === obj.id
-    );
-
     const editedViewObjects = [...viewObjects];
-    editedViewObjects[objIndex] = {
-      ...obj,
-      [key]: value
+
+    const recursiveSearch = viewObjectsToSearch => {
+      viewObjectsToSearch.forEach((viewObjectToSearch, index) => {
+        if (viewObjectToSearch.id === obj.id) {
+          viewObjectToSearch[key] = value;
+        } else {
+          recursiveSearch(viewObjectToSearch.children);
+        }
+      });
     };
+
+    recursiveSearch(editedViewObjects);
 
     setViewObjects(editedViewObjects);
   };
