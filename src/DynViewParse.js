@@ -1,18 +1,18 @@
 import React from "react";
-import TestComponent from "./TestComponent";
+import Components from "./components/index";
 
-const Components = { TestComponent };
-
-const DynViewHook = viewObjects => {
+const DynViewParse = viewObjects => {
   const parseViewObject = viewObject => {
     if (Components[viewObject.tag]) {
       return React.createElement(
         Components[viewObject.tag],
         {
+          key: "parsedViewObject" + viewObject.id,
           style: viewObject.style,
           onClick: viewObject.onClick,
           id: viewObject.id,
-          className: viewObject.className
+          className: viewObject.className,
+          ...viewObject.props
         },
         viewObject.body,
         viewObject.children.map(child => parseViewObject(child))
@@ -21,10 +21,12 @@ const DynViewHook = viewObjects => {
       return React.createElement(
         viewObject.tag,
         {
+          key: "parsedViewObject" + viewObject.id,
           style: viewObject.style,
           onClick: viewObject.onClick,
           id: viewObject.id,
-          className: viewObject.className
+          className: viewObject.className,
+          ...viewObject.props
         },
         viewObject.body,
         viewObject.children.map(child => parseViewObject(child))
@@ -43,4 +45,4 @@ const DynViewHook = viewObjects => {
   return viewObjects.length ? convertViewobjectsToReactElements() : [];
 };
 
-export default DynViewHook;
+export default DynViewParse;

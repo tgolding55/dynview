@@ -1,8 +1,8 @@
-import React from "react";
-import DynViewHook from "./DynViewHook";
+//import React from "react";
+import DynViewParse from "./DynViewParse";
 
 const DynView = ({ viewObjects }) => {
-  return DynViewHook(viewObjects);
+  return DynViewParse(viewObjects);
 };
 
 export default DynView;

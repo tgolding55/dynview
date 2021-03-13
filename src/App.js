@@ -24,9 +24,11 @@ function App() {
             paddingTop: 0,
             paddingBottom: 0
           }}
+          color="black"
         >
           <Grid.Column style={{ paddingLeft: 0, paddingRight: 0 }}>
-            <Link to="/dynview">To View</Link>{" "}
+            <Link to="/dynview">To View</Link>
+
             <Link to="/dynedit">To Edit</Link>
           </Grid.Column>
         </Grid.Row>

@@ -9,7 +9,8 @@ import {
   TextArea,
   Confirm
 } from "semantic-ui-react";
-import DynViewHook from "./DynViewHook";
+import DynViewParse from "./DynViewParse";
+import Components from "./components/index";
 
 const DynEdit = ({ viewObjects, setViewObjects }) => {
   const [selectedObj, setSelectedObj] = useState({});
@@ -19,7 +20,8 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
     style: { backgroundColor: "white", color: "black" },
     className: "",
     body: "",
-    children: []
+    children: [],
+    props: {}
   });
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -39,16 +41,18 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
     recursiveSearch(viewObjects);
   };
 
-  const prepareEditObject = viewObject => {
-    viewObject.onClick = handleClick;
-    viewObject.children.forEach(child => prepareEditObject(child));
-    return viewObject;
+  const prepareEditObject = editObject => {
+    console.log(editObject);
+    editObject.onClick = handleClick;
+    editObject.props.draggable = true;
+    editObject.children.forEach(child => prepareEditObject(child));
+    return editObject;
   };
 
   const preparedEditObjects = () => {
-    const editObjects = viewObjects;
+    const editObjects = JSON.parse(JSON.stringify(viewObjects));
 
-    return editObjects.map(viewObject => prepareEditObject(viewObject));
+    return editObjects.map(editObject => prepareEditObject(editObject));
   };
 
   const getAvailableId = () => {
@@ -67,7 +71,7 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
     return maxId;
   };
 
-  const addElement = () => {
+  const addElement = elToAdd => {
     if (Object.keys(selectedObj).length) {
       const editedViewObjects = [...viewObjects];
 
@@ -76,7 +80,7 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
           if (viewObjectToSearch.id === selectedObj.id) {
             viewObjectToSearch.children = [
               ...selectedObj.children,
-              { ...newElement, id: getAvailableId() }
+              { ...elToAdd, id: getAvailableId() }
             ];
           } else {
             recursiveSearch(viewObjectToSearch.children);
@@ -87,7 +91,7 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
 
       setViewObjects(editedViewObjects);
     } else {
-      setViewObjects([...viewObjects, { ...newElement, id: getAvailableId() }]);
+      setViewObjects([...viewObjects, { ...elToAdd, id: getAvailableId() }]);
     }
   };
 
@@ -179,7 +183,9 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
                   selection
                 ></Dropdown>
               </Form.Field>
-              <Button onClick={() => addElement()}>Add new element</Button>
+              <Button onClick={() => addElement(newElement)}>
+                Add new element
+              </Button>
             </Form>
             <Divider />
             {Object.keys(selectedObj).length ? (
@@ -265,6 +271,17 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
               ""
             )}
           </div>
+          <div>
+            {Object.keys(Components).map(Component => (
+              <h1
+                onClick={() =>
+                  addElement({ tag: Component, children: [], props: {} })
+                }
+              >
+                {Component}
+              </h1>
+            ))}
+          </div>
         </Grid.Column>
         <Grid.Column
           style={{
@@ -279,7 +296,7 @@ const DynEdit = ({ viewObjects, setViewObjects }) => {
               setSelectedObj({});
             }}
           >
-            {DynViewHook(preparedEditObjects())}
+            {DynViewParse(preparedEditObjects())}
           </div>
         </Grid.Column>
       </Grid.Row>
